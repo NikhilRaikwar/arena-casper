@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { join } from "path";
 import { createArenaClient } from "../agents/shared/arena-client.js";
 import { loadConfig } from "../agents/shared/config.js";
 
@@ -10,6 +11,10 @@ const port = Number(process.env.SPECTATOR_PORT ?? 3001);
 
 app.use(cors());
 app.use(express.static("spectator/public"));
+
+app.get("/dashboard", (_req, res) => {
+  res.sendFile(join(process.cwd(), "spectator/public/dashboard.html"));
+});
 
 app.get("/api/match", async (_req, res) => {
   res.json(await client.getLatestMatch());

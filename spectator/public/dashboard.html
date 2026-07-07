@@ -1079,14 +1079,22 @@ async function bootstrap() {
   // Get active match state
   const matchRes = await fetch('/api/match');
   if (!matchRes.ok) return;
+  const matchType = matchRes.headers.get("content-type");
+  if (!matchType || !matchType.includes("application/json")) {
+    console.warn("Expected JSON response from /api/match, received: ", matchType);
+    return;
+  }
   matchState = await matchRes.json();
-  if (!matchState) return;
+  if (!matchState || !matchState.id) return;
 
   // Get past events
   const eventsRes = await fetch('/api/events');
   if (eventsRes.ok) {
-    const events = await eventsRes.json();
-    processPastEvents(events);
+    const eventsType = eventsRes.headers.get("content-type");
+    if (eventsType && eventsType.includes("application/json")) {
+      const events = await eventsRes.json();
+      processPastEvents(events);
+    }
   }
 
   renderState();
