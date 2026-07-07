@@ -37,8 +37,8 @@ graph TD
     %% Flow Connections
     CSPRPrice -->|Live Prices| Alpha
     CSPRPrice -->|Live Prices| Beta
-    Alpha -->|record_trade() + Reasoning Hash| OdraContract
-    Beta -->|record_trade() + Reasoning Hash| OdraContract
+    Alpha -->|record_trade + Reasoning Hash| OdraContract
+    Beta -->|record_trade + Reasoning Hash| OdraContract
     OdraContract -->|On-Chain Events / CSPR.cloud| SpectatorServer
     SpectatorServer -->|Real-Time SSE Events| Dashboard
 
