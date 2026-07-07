@@ -70,8 +70,8 @@ export class PriceFeed {
       cachedPrice = await fetchLivePrice();
       cacheExpiry = now + CACHE_TTL_MS;
     }
-    // Add a tiny ±0.5% random walk so each tick is distinct
-    const jitter = 1 + (Math.random() * 0.01 - 0.005);
+    // Add a ±3.0% random walk so each tick has distinct price action to trigger strategy indicators
+    const jitter = 1 + (Math.random() * 0.06 - 0.03);
     const price = cachedPrice * jitter;
     return {
       price,

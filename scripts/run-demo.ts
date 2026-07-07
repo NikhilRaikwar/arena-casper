@@ -21,8 +21,8 @@ const matchId = await createAndStartDemoMatch();
 
 console.log(`\n🤖 Running Agents (Alpha & Beta) concurrently in real-time...`);
 await Promise.all([
-  runAgent({ agentId: "alpha", matchId, iterations: 6 }),
-  runAgent({ agentId: "beta", matchId, iterations: 6 })
+  runAgent({ agentId: "alpha", matchId, iterations: 10 }),
+  runAgent({ agentId: "beta", matchId, iterations: 10 })
 ]);
 
 console.log("\n⚖️ Settling Match on-chain...");
