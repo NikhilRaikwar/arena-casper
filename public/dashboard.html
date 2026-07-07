@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arena ⚔️ — Live Match Dashboard</title>
+<meta name="description" content="Verify strategy rationales, trade execution, and settlement transparently on the Arena Live Match Dashboard built on Casper Testnet.">
+<meta name="keywords" content="Casper Network, AI Agents, Agentic AI, DeFi, RWA, Blockchain, Odra Framework, Smart Contracts, Quantitative Trading">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  /* ── RESET & TOKENS ─────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:       #050B18;
+    --bg-1:     #080F20;
+    --bg-2:     #0A1228;
+    --bg-3:     #0F1A3A;
+    --bg-4:     #162040;
+    --violet:   #7C3AED;
+    --violet-l: #9D5FF5;
+    --violet-d: #5B21B6;
+    --teal:     #00E5CC;
+    --teal-d:   #00B8A5;
+    --white:    #F0F4FF;
+    --w60:      rgba(240,244,255,.6);
+    --w30:      rgba(240,244,255,.3);
+    --w15:      rgba(240,244,255,.15);
+    --w08:      rgba(240,244,255,.08);
+    --w04:      rgba(240,244,255,.04);
+    --green:    #00E5A0;
+    --red:      #FF4D6A;
+    --amber:    #FFB020;
+    --blue:     #60A5FA;
+    --border:   rgba(240,244,255,.07);
+    --border-v: rgba(124,58,237,.35);
+    --border-t: rgba(0,229,204,.35);
+    --glow-v:   0 0 20px rgba(124,58,237,.25);
+    --font-d:   'Space Grotesk', sans-serif;
+    --font-b:   'Inter', sans-serif;
+    --font-m:   'JetBrains Mono', monospace;
+    --radius:   10px;
+    --r-sm:     7px;
+  }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font-b);
+    font-size: 13px;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+  }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-2); }
+  ::-webkit-scrollbar-thumb { background: var(--violet-d); border-radius: 2px; }
+
+  /* ── TOPBAR ─────────────────────────────────────── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1.25rem; height: 52px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0; gap: 1rem; z-index: 50;
+  }
+  .tb-left { display: flex; align-items: center; gap: 1.25rem; }
+  .logo-link {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-d); font-size: 16px; font-weight: 700;
+    color: var(--white); text-decoration: none;
+  }
+  .logo-icon {
+    width: 28px; height: 28px; background: var(--violet);
+    border-radius: 7px; display: flex; align-items: center;
+    justify-content: center; font-size: 14px;
+  }
+  .tb-sep { width: 1px; height: 24px; background: var(--border); }
+  .match-id {
+    font-family: var(--font-m); font-size: 11px; color: var(--w30);
+    letter-spacing: .04em;
+  }
+  .match-id span { color: var(--white); font-weight: 500; }
+  .tb-center { display: flex; align-items: center; gap: 2rem; flex: 1; justify-content: center; }
+  .score-pill {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg-3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 5px 14px;
+  }
+  .sp-val {
+    font-family: var(--font-d); font-size: 15px; font-weight: 700;
+  }
+  .sp-val.alpha { color: var(--violet-l); }
+  .sp-val.beta  { color: var(--teal); }
+  .sp-sep {
+    font-family: var(--font-m); font-size: 12px; color: var(--w30);
+    padding: 0 4px;
+  }
+  .tb-right { display: flex; align-items: center; gap: .75rem; }
+  .live-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 20px;
+    background: rgba(0,229,160,.1); border: 1px solid rgba(0,229,160,.3);
+    font-family: var(--font-m); font-size: 10px; font-weight: 600;
+    color: var(--green); letter-spacing: .06em;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); animation: blink 1.4s infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; } 50% { opacity: .2; }
+  }
+  .block-counter {
+    font-family: var(--font-m); font-size: 11px; color: var(--w30);
+  }
+  .block-counter span { color: var(--amber); }
+  .btn-sm {
+    padding: 5px 12px; border-radius: 7px;
+    background: var(--w08); border: 1px solid var(--border);
+    font-family: var(--font-b); font-size: 12px; font-weight: 500;
+    color: var(--white); cursor: pointer; text-decoration: none;
+    transition: background .15s;
+  }
+  .btn-sm:hover { background: var(--w15); }
+  .btn-sm.primary { background: var(--violet); border-color: var(--violet); }
+  .btn-sm.primary:hover { background: var(--violet-l); }
+
+  /* ── MAIN LAYOUT ────────────────────────────────── */
+  .main {
+    flex: 1; display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    grid-template-rows: 1fr;
+    overflow: hidden; gap: 0;
+  }
+
+  /* ── PANELS ─────────────────────────────────────── */
+  .panel {
+    border-right: 1px solid var(--border);
+    overflow-y: auto; display: flex; flex-direction: column;
+  }
+  .panel:last-child { border-right: none; border-left: 1px solid var(--border); }
+  .right-panel { overflow: hidden; min-height: 0; }
+  .panel-center { border-right: 1px solid var(--border); overflow-y: auto; }
+
+  /* ── PANEL HEADER ───────────────────────────────── */
+  .ph {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .6rem 1rem;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0; position: sticky; top: 0; z-index: 10;
+  }
+  .ph-title {
+    font-family: var(--font-m); font-size: 10px; font-weight: 500;
+    color: var(--w30); text-transform: uppercase; letter-spacing: .1em;
+  }
+  .ph-badge {
+    font-family: var(--font-m); font-size: 9px; font-weight: 600;
+    padding: 2px 7px; border-radius: 5px;
+  }
+  .ph-badge.violet { background: rgba(124,58,237,.2); color: var(--violet-l); }
+  .ph-badge.teal   { background: rgba(0,229,204,.15); color: var(--teal); }
+  .ph-badge.green  { background: rgba(0,229,160,.15); color: var(--green); }
+  .ph-badge.amber  { background: rgba(255,176,32,.15); color: var(--amber); }
+
+  /* ── AGENT PANELS ───────────────────────────────── */
+  .agent-section { padding: .75rem 1rem; }
+  .agent-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .agent-avatar {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .av-alpha { background: rgba(124,58,237,.2); border: 1px solid var(--border-v); }
+  .av-beta  { background: rgba(0,229,204,.1); border: 1px solid var(--border-t); }
+  .agent-name-wrap { flex: 1; padding-left: .75rem; }
+  .agent-name {
+    font-family: var(--font-d); font-size: 14px; font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .an-alpha { color: var(--violet-l); }
+  .an-beta  { color: var(--teal); }
+  .agent-strat {
+    font-family: var(--font-m); font-size: 9px; color: var(--w30);
+    text-transform: uppercase; letter-spacing: .07em;
+  }
+  .agent-status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green); margin-top: 4px;
+    animation: blink 1.4s infinite;
+  }
+
+  /* big value */
+  .agent-big-value {
+    text-align: center; padding: .75rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: .75rem;
+  }
+  .abv-label { font-family: var(--font-m); font-size: 9px; color: var(--w30); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+  .abv-number {
+    font-family: var(--font-d); font-size: 28px; font-weight: 700;
+    letter-spacing: -.02em; line-height: 1;
+  }
+  .abv-delta {
+    font-family: var(--font-m); font-size: 11px; margin-top: 4px;
+  }
+
+  /* stat rows */
+  .stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 5px 0; border-bottom: 1px solid var(--border);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .sr-label { font-size: 11px; color: var(--w30); }
+  .sr-val { font-family: var(--font-m); font-size: 11px; color: var(--white); }
+  .sr-val.up { color: var(--green); }
+  .sr-val.down { color: var(--red); }
+  .sr-val.amber { color: var(--amber); }
+
+  /* mini bar chart */
+  .mini-bars { display: flex; align-items: flex-end; gap: 3px; height: 40px; margin: .75rem 0; }
+  .mini-bar {
+    width: 8px; flex-shrink: 0;
+    border-radius: 3px 3px 0 0;
+    transition: height .4s ease;
+  }
+
+  /* last decision box */
+  .decision-box {
+    background: var(--bg-3); border-radius: var(--r-sm);
+    padding: .6rem .75rem; margin-top: .75rem;
+    border: 1px solid var(--border);
+  }
+  .db-label { font-family: var(--font-m); font-size: 9px; color: var(--w30); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+  .db-action {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--font-m); font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px; margin-bottom: 5px;
+  }
+  .db-buy  { background: rgba(0,229,160,.15); color: var(--green); }
+  .db-sell { background: rgba(255,77,106,.15); color: var(--red); }
+  .db-hold { background: var(--w08); color: var(--w60); }
+  .db-reason { font-size: 11px; color: var(--w60); line-height: 1.5; }
+  .db-hash { font-family: var(--font-m); font-size: 9px; color: var(--violet-l); margin-top: 4px; display: block; text-decoration: none; }
+  .db-hash:hover { text-decoration: underline; }
+
+  /* ── CENTER PANEL ───────────────────────────────── */
+  .center-body { padding: .75rem 1rem; }
+
+  /* chart */
+  .chart-wrap {
+    background: var(--bg-1); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: .75rem;
+    margin-bottom: .75rem;
+  }
+  .chart-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: .75rem;
+  }
+  .chart-title {
+    font-family: var(--font-d); font-size: 13px; font-weight: 600;
+    color: var(--white);
+  }
+  .chart-legend { display: flex; gap: 1rem; }
+  .cl-item { display: flex; align-items: center; gap: 5px; font-family: var(--font-m); font-size: 10px; color: var(--w60); }
+  .cl-dot { width: 8px; height: 8px; border-radius: 50%; }
+  canvas { max-height: 220px; }
+
+  /* match timer */
+  .timer-section {
+    background: var(--bg-1); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: .75rem 1rem;
+    margin-bottom: .75rem;
+    display: flex; align-items: center; gap: 1.5rem;
+  }
+  .timer-block {
+    text-align: center; flex: 1;
+  }
+  .timer-val {
+    font-family: var(--font-d); font-size: 22px; font-weight: 700;
+    color: var(--white); line-height: 1;
+  }
+  .timer-val.urgent { color: var(--amber); }
+  .timer-label { font-family: var(--font-m); font-size: 9px; color: var(--w30); text-transform: uppercase; letter-spacing: .07em; margin-top: 3px; }
+  .timer-sep { width: 1px; height: 32px; background: var(--border); }
+  .progress-bar-wrap {
+    flex: 2;
+  }
+  .pb-label { display: flex; justify-content: space-between; font-family: var(--font-m); font-size: 9px; color: var(--w30); margin-bottom: 5px; }
+  .pb-track { height: 6px; background: var(--bg-3); border-radius: 3px; overflow: hidden; }
+  .pb-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--violet), var(--teal));
+    transition: width .5s ease;
+  }
+
+  /* vs bar */
+  .vs-bar-section {
+    background: var(--bg-1); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: .75rem 1rem;
+    margin-bottom: .75rem;
+  }
+  .vs-bar-header { display: flex; justify-content: space-between; margin-bottom: .6rem; }
+  .vs-bar-name { font-family: var(--font-m); font-size: 10px; font-weight: 600; }
+  .vs-bar-name.alpha { color: var(--violet-l); }
+  .vs-bar-name.beta  { color: var(--teal); }
+  .vs-bar-track {
+    height: 10px; background: var(--bg-3); border-radius: 5px;
+    overflow: hidden; display: flex;
+  }
+  .vs-bar-alpha {
+    height: 100%; border-radius: 5px 0 0 5px;
+    background: linear-gradient(90deg, var(--violet-d), var(--violet));
+    transition: width .6s ease;
+  }
+  .vs-bar-beta {
+    height: 100%; border-radius: 0 5px 5px 0;
+    background: linear-gradient(90deg, var(--teal-d), var(--teal));
+    transition: width .6s ease;
+  }
+  .vs-bar-vals { display: flex; justify-content: space-between; margin-top: 5px; }
+  .vs-bar-v { font-family: var(--font-m); font-size: 10px; }
+  .vs-bar-v.alpha { color: var(--violet-l); }
+  .vs-bar-v.beta  { color: var(--teal); }
+
+  /* ── RIGHT PANEL — TRADE FEED ───────────────────── */
+  .feed-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  .right-panel .feed-wrap { border-bottom: 1px solid var(--border); }
+  .beta-agent-card {
+    flex: 0 0 360px;
+    min-height: 320px;
+    max-height: 44vh;
+    overflow-y: auto;
+    background: linear-gradient(180deg, var(--bg-1), var(--bg));
+  }
+  .beta-agent-card .ph { position: relative; top: auto; }
+  .beta-agent-card .agent-section { padding-bottom: 1rem; }
+  .trade-item {
+    padding: .6rem 1rem;
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+    animation: fade-in .3s ease;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; background: rgba(124,58,237,.1); }
+    to { opacity: 1; background: transparent; }
+  }
+  .trade-item:hover { background: var(--w04); }
+  .ti-row1 {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 3px;
+  }
+  .ti-time { font-family: var(--font-m); font-size: 9px; color: var(--w30); min-width: 54px; }
+  .ti-agent { font-family: var(--font-m); font-size: 10px; font-weight: 600; min-width: 50px; }
+  .ti-agent.alpha { color: var(--violet-l); }
+  .ti-agent.beta  { color: var(--teal); }
+  .ti-badge {
+    font-family: var(--font-m); font-size: 9px; font-weight: 700;
+    padding: 1px 7px; border-radius: 4px;
+  }
+  .ti-buy  { background: rgba(0,229,160,.15); color: var(--green); }
+  .ti-sell { background: rgba(255,77,106,.15); color: var(--red); }
+  .ti-hold { background: var(--w08); color: var(--w60); }
+  .ti-pair { font-family: var(--font-m); font-size: 9px; color: var(--w30); }
+  .ti-row2 { display: flex; align-items: center; justify-content: space-between; }
+  .ti-val { font-family: var(--font-m); font-size: 10px; color: var(--w60); }
+  .ti-hash { font-family: var(--font-m); font-size: 9px; color: var(--violet-l); text-decoration: none; }
+  .ti-hash:hover { text-decoration: underline; }
+
+  /* on-chain indicator */
+  .onchain-tag {
+    font-family: var(--font-m); font-size: 8px; font-weight: 600;
+    padding: 1px 5px; border-radius: 3px;
+    background: rgba(0,229,160,.1); border: 1px solid rgba(0,229,160,.2);
+    color: var(--green); letter-spacing: .05em;
+    margin-left: auto;
+  }
+
+  /* ── BOTTOM BAR ─────────────────────────────────── */
+  .bottom-bar {
+    display: flex; align-items: center; gap: 1.5rem;
+    padding: 0 1.25rem; height: 36px;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    flex-shrink: 0; overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .bb-item {
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-m); font-size: 10px; white-space: nowrap;
+  }
+  .bb-label { color: var(--w30); }
+  .bb-val { color: var(--white); }
+  .bb-val.green { color: var(--green); }
+  .bb-val.red   { color: var(--red); }
+  .bb-val.amber { color: var(--amber); }
+  .bb-sep { width: 1px; height: 16px; background: var(--border); flex-shrink: 0; }
+  .bb-contract { margin-left: auto; }
+
+  /* settlement overlay */
+  .settlement-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    display: grid; place-items: center;
+    background: rgba(5,11,24,.78);
+    backdrop-filter: blur(10px);
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .settlement-overlay.show { opacity: 1; pointer-events: auto; }
+  .settlement-modal {
+    width: min(520px, calc(100vw - 32px));
+    border: 1px solid var(--border-v);
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+    box-shadow: 0 30px 90px rgba(0,0,0,.45), var(--glow-v);
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .settlement-kicker {
+    font-family: var(--font-m); font-size: 10px; color: var(--green);
+    letter-spacing: .12em; text-transform: uppercase; margin-bottom: .5rem;
+  }
+  .settlement-title {
+    font-family: var(--font-d); font-size: clamp(28px, 6vw, 44px);
+    line-height: 1; margin-bottom: 1rem;
+  }
+  .settlement-scores {
+    display: grid; grid-template-columns: 1fr 1fr; gap: .75rem;
+    margin: 1rem 0 1.25rem;
+  }
+  .settlement-score {
+    border: 1px solid var(--border);
+    background: var(--w04); border-radius: var(--r-sm);
+    padding: .75rem;
+  }
+  .settlement-score span {
+    display: block; font-family: var(--font-m); font-size: 10px;
+    color: var(--w30); text-transform: uppercase; letter-spacing: .08em;
+  }
+  .settlement-score strong {
+    display: block; font-family: var(--font-d); font-size: 24px;
+    margin-top: .2rem;
+  }
+  .settlement-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 36px; padding: 0 1rem; border-radius: 7px;
+    background: var(--violet); color: var(--white);
+    font-size: 12px; font-weight: 700; text-decoration: none;
+  }
+
+  /* ── SECTION WITHIN PANELS ──────────────────────── */
+  .p-section {
+    padding: .75rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .p-section:last-child { border-bottom: none; }
+
+  /* contract info */
+  .contract-box {
+    background: var(--bg-3); border-radius: var(--r-sm);
+    padding: .6rem .75rem;
+    border: 1px solid var(--border);
+  }
+  .cb-label { font-family: var(--font-m); font-size: 9px; color: var(--w30); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 4px; }
+  .cb-hash { font-family: var(--font-m); font-size: 10px; color: var(--teal); word-break: break-all; line-height: 1.6; }
+  .cb-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 4px; font-family: var(--font-m); font-size: 9px;
+    color: var(--violet-l); text-decoration: none;
+    transition: color .2s;
+  }
+  .cb-link:hover { color: var(--white); }
+
+  /* match log */
+  .log-item {
+    display: flex; gap: 8px; padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-time { font-family: var(--font-m); font-size: 9px; color: var(--w30); min-width: 48px; }
+  .log-msg { color: var(--w60); line-height: 1.45; }
+  .log-msg .hl-v { color: var(--violet-l); font-weight: 500; }
+  .log-msg .hl-t { color: var(--teal); font-weight: 500; }
+  .log-msg .hl-g { color: var(--green); font-weight: 500; }
+
+  /* ── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .main { grid-template-columns: 220px 1fr 220px; }
+  }
+  @media (max-width: 860px) {
+    html, body { overflow: auto; }
+    .main { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; }
+    .panel { border-right: none; border-bottom: 1px solid var(--border); overflow-y: visible; }
+    .panel:last-child { border-left: none; }
+    .right-panel { overflow: visible; }
+    .beta-agent-card { flex-basis: auto; max-height: none; }
+    canvas { max-height: 180px; }
+  }
+  @media (max-width: 600px) {
+    .tb-center { display: none; }
+    .timer-section { flex-wrap: wrap; gap: .75rem; }
+    .bb-contract { margin-left: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="tb-left">
+    <a href="/" class="logo-link">
+      <div class="logo-icon">⚔️</div>
+      Arena
+    </a>
+    <div class="tb-sep"></div>
+    <div class="match-id">Match <span id="hdr-match-id">#0042</span> · CSPR/USDT</div>
+  </div>
+  <div class="tb-center">
+    <div class="score-pill">
+      <span class="sp-val alpha" id="hdr-alpha">1,247</span>
+      <span class="sp-sep">CSPR</span>
+      <span style="font-family:var(--font-m);font-size:11px;color:var(--w30)">α</span>
+      <span class="sp-sep">·</span>
+      <span style="font-family:var(--font-m);font-size:11px;color:var(--w30)">β</span>
+      <span class="sp-sep">CSPR</span>
+      <span class="sp-val beta" id="hdr-beta">967</span>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="block-counter">Block <span id="block-num">3,847,201</span></div>
+    <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+
+  </div>
+</header>
+
+<!-- MAIN GRID -->
+<div class="main">
+
+  <!-- LEFT — AGENT ALPHA -->
+  <div class="panel">
+    <div class="ph">
+      <span class="ph-title">Agent Alpha</span>
+      <span class="ph-badge violet">MOMENTUM</span>
+    </div>
+
+    <div class="agent-section">
+      <div class="agent-header">
+        <div class="agent-avatar av-alpha">🤖</div>
+        <div class="agent-name-wrap">
+          <div class="agent-name an-alpha">Agent Alpha</div>
+          <div class="agent-strat">Momentum · SMA Cross</div>
+        </div>
+        <div class="agent-status-dot"></div>
+      </div>
+
+      <div class="agent-big-value">
+        <div class="abv-label">Portfolio Value</div>
+        <div class="abv-number" id="alpha-val" style="color:var(--violet-l)">1,247 CSPR</div>
+        <div class="abv-delta" id="alpha-delta" style="color:var(--green)">▲ +24.7% from start</div>
+      </div>
+
+      <div class="p-section" style="padding:.6rem 0">
+        <div class="stat-row"><span class="sr-label">Starting value</span><span class="sr-val">1,000 CSPR</span></div>
+        <div class="stat-row"><span class="sr-label">Total trades</span><span class="sr-val" id="alpha-trades">18</span></div>
+        <div class="stat-row"><span class="sr-label">Profitable trades</span><span class="sr-val up" id="alpha-wins">12</span></div>
+        <div class="stat-row"><span class="sr-label">Win rate</span><span class="sr-val up" id="alpha-wr">66.7%</span></div>
+        <div class="stat-row"><span class="sr-label">Last action</span><span class="sr-val amber" id="alpha-last">BUY</span></div>
+        <div class="stat-row"><span class="sr-label">Network</span><span class="sr-val">Casper Testnet</span></div>
+      </div>
+
+      <!-- mini bars -->
+      <div class="p-section">
+        <div style="font-family:var(--font-m);font-size:9px;color:var(--w30);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem">Trade History</div>
+        <div class="mini-bars" id="alpha-bars">
+          <div class="mini-bar" style="height:60%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:80%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:40%;background:var(--red)"></div>
+          <div class="mini-bar" style="height:90%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:55%;background:var(--w30)"></div>
+          <div class="mini-bar" style="height:70%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:35%;background:var(--red)"></div>
+          <div class="mini-bar" style="height:95%;background:var(--green)"></div>
+        </div>
+      </div>
+
+      <!-- last decision -->
+      <div class="p-section">
+        <div class="decision-box">
+          <div class="db-label">Last AI Decision</div>
+          <span class="db-action db-hold" id="alpha-action">Awaiting Match...</span>
+          <div class="db-reason" id="alpha-reason">Agent has not executed any trades yet.</div>
+          <a href="#" class="db-hash" id="alpha-hash" target="_blank" style="display:none;">tx: Awaiting...</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER — CHART + MATCH INFO -->
+  <div class="panel-center">
+    <div class="center-body">
+
+      <!-- MATCH TIMER -->
+      <div class="timer-section">
+        <div class="timer-block">
+          <div class="timer-val" id="timer-blocks">28</div>
+          <div class="timer-label">Blocks Left</div>
+        </div>
+        <div class="timer-sep"></div>
+        <div class="timer-block">
+          <div class="timer-val" id="timer-trades">36</div>
+          <div class="timer-label">Total Trades</div>
+        </div>
+        <div class="timer-sep"></div>
+        <div class="progress-bar-wrap">
+          <div class="pb-label"><span>Match Progress</span><span id="pb-pct">72%</span></div>
+          <div class="pb-track"><div class="pb-fill" id="pb-fill" style="width:72%"></div></div>
+        </div>
+      </div>
+
+      <!-- VS BAR -->
+      <div class="vs-bar-section">
+        <div class="vs-bar-header">
+          <span class="vs-bar-name alpha" id="vs-alpha-name">α Alpha · 1,000 CSPR</span>
+          <span style="font-family:var(--font-m);font-size:9px;color:var(--w30)">PORTFOLIO SPLIT</span>
+          <span class="vs-bar-name beta" id="vs-beta-name">1,000 CSPR · Beta β</span>
+        </div>
+        <div class="vs-bar-track">
+          <div class="vs-bar-alpha" id="vs-alpha" style="width:56.3%"></div>
+          <div class="vs-bar-beta"  id="vs-beta"  style="width:43.7%"></div>
+        </div>
+        <div class="vs-bar-vals">
+          <span class="vs-bar-v alpha" id="vs-alpha-pct">56.3%</span>
+          <span style="font-family:var(--font-m);font-size:9px;color:var(--w30)">of total pool</span>
+          <span class="vs-bar-v beta" id="vs-beta-pct">43.7%</span>
+        </div>
+      </div>
+
+      <!-- CHART -->
+      <div class="chart-wrap">
+        <div class="chart-header">
+          <div class="chart-title">Portfolio Value Over Time</div>
+          <div class="chart-legend">
+            <div class="cl-item"><div class="cl-dot" style="background:var(--violet)"></div>α Alpha</div>
+            <div class="cl-item"><div class="cl-dot" style="background:var(--teal)"></div>β Beta</div>
+          </div>
+        </div>
+        <canvas id="main-chart"></canvas>
+      </div>
+
+      <!-- CONTRACT INFO -->
+      <div class="contract-box" style="margin-bottom:.75rem">
+        <div class="cb-label">Arena Contract · Casper Testnet</div>
+        <div class="cb-hash" id="contract-hash-display">contract-cf8cade69ae3a7839a6d734483db875e57f933c269cf04e008f41262e0407cbb</div>
+        <a href="https://testnet.cspr.live/deploy/f7a9bf79a9c8694dde2a5e1e6b725cead3bb5bc8a4fbb3bd15d05e2d0f9ae7e7" target="_blank" class="cb-link">Deploy on CSPR.live ↗</a>
+      </div>
+
+      <!-- DUAL FEED & LOG GRID -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: .75rem;">
+        <!-- LEFT: MATCH EVENT LOG -->
+        <div class="chart-wrap" style="margin-bottom:0; display:flex; flex-direction:column; height: 280px; overflow: hidden;">
+          <div class="chart-header" style="margin-bottom:.5rem; flex-shrink: 0;">
+            <div class="chart-title">Match Event Log</div>
+            <div class="ph-badge green">ON-CHAIN</div>
+          </div>
+          <div id="match-log" style="flex:1; overflow-y:auto; font-family:var(--font-m); font-size:11px;">
+            <div class="log-item"><span class="log-time">on-chain</span><span class="log-msg">Contract deployed · <a href="https://testnet.cspr.live/deploy/f7a9bf79a9c8694dde2a5e1e6b725cead3bb5bc8a4fbb3bd15d05e2d0f9ae7e7" target="_blank" class="log-link">f7a9bf…e7e7</a></span></div>
+            <div class="log-item"><span class="log-time">on-chain</span><span class="log-msg">Match <span class="hl-v">#2</span> created · <a href="https://testnet.cspr.live/deploy/3d55be3b4fa45cc2b4037b71753aa28f65a3270f79e0564bb694c72dd1f21cf8" target="_blank" class="log-link">3d55be…1cf8</a></span></div>
+            <div class="log-item"><span class="log-time">on-chain</span><span class="log-msg">Match started · <a href="https://testnet.cspr.live/deploy/87283a8a430a015e50d931bff16ca3723d96b10d8ec054e8f9685d06b2622455" target="_blank" class="log-link">87283a…2455</a></span></div>
+            <div class="log-item"><span class="log-time">on-chain</span><span class="log-msg"><span class="hl-v">Alpha</span> trade · <a href="https://testnet.cspr.live/deploy/2da110df43f21f515469be5e198a6c7c6b99c9495a5484362b48190933e88980" target="_blank" class="log-link">2da110…8980</a></span></div>
+            <div class="log-item"><span class="log-time">on-chain</span><span class="log-msg"><span class="hl-t">Beta</span> trade · <a href="https://testnet.cspr.live/deploy/fa0f5d7d72aa6330c62a82f9d5daa43ece305ed4f06f84ee4e0e72027248ce85" target="_blank" class="log-link">fa0f5d…ce85</a></span></div>
+            <div class="log-item"><span class="log-time">on-chain</span><span class="log-msg">Settled · <a href="https://testnet.cspr.live/deploy/12f10c3764c65c11c8a2b173b4be1d9ffd89add534ee42a7b42a9077dcde3ab9" target="_blank" class="log-link">12f10c…3ab9</a></span></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: LIVE TRADE FEED -->
+        <div class="chart-wrap" style="margin-bottom:0; display:flex; flex-direction:column; height: 280px; overflow: hidden;">
+          <div class="chart-header" style="margin-bottom:.5rem; flex-shrink: 0;">
+            <div class="chart-title">Live Trade Feed</div>
+            <div class="ph-badge green">SSE STREAM</div>
+          </div>
+          <div class="feed-wrap" id="trade-feed" style="flex:1; overflow-y:auto;">
+            <div class="trade-item">
+              <div class="ti-row1">
+                <span class="ti-time">14:32:08</span>
+                <span class="ti-agent alpha">α Alpha</span>
+                <span class="ti-badge ti-buy">BUY</span>
+                <span class="ti-pair">CSPR/USDT</span>
+                <span class="onchain-tag">ON-CHAIN</span>
+              </div>
+              <div class="ti-row2">
+                <span class="ti-val">+45.2 CSPR · Portfolio: 1,247</span>
+                <a href="https://testnet.cspr.live/deploy/2da110df43f21f515469be5e198a6c7c6b99c9495a5484362b48190933e88980" class="ti-hash" target="_blank">2da110…8980</a>
+              </div>
+            </div>
+            <div class="trade-item">
+              <div class="ti-row1">
+                <span class="ti-time">14:31:44</span>
+                <span class="ti-agent beta">β Beta</span>
+                <span class="ti-badge ti-sell">SELL</span>
+                <span class="ti-pair">CSPR/USDT</span>
+                <span class="onchain-tag">ON-CHAIN</span>
+              </div>
+              <div class="ti-row2">
+                <span class="ti-val">−28.1 CSPR · Portfolio: 967</span>
+                <a href="https://testnet.cspr.live/deploy/fa0f5d7d72aa6330c62a82f9d5daa43ece305ed4f06f84ee4e0e72027248ce85" class="ti-hash" target="_blank">fa0f5d…ce85</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT — AGENT BETA -->
+  <div class="panel">
+    <div class="ph">
+      <span class="ph-title">Agent Beta</span>
+      <span class="ph-badge teal">MEAN REV</span>
+    </div>
+
+    <div class="agent-section">
+      <div class="agent-header">
+        <div class="agent-avatar av-beta">🤖</div>
+        <div class="agent-name-wrap">
+          <div class="agent-name an-beta">Agent Beta</div>
+          <div class="agent-strat">Mean Reversion · Drop/Recover</div>
+        </div>
+        <div class="agent-status-dot"></div>
+      </div>
+
+      <div class="agent-big-value">
+        <div class="abv-label">Portfolio Value</div>
+        <div class="abv-number" id="beta-val" style="color:var(--teal)">967 CSPR</div>
+        <div class="abv-delta" id="beta-delta" style="color:var(--red)">▼ −3.3% from start</div>
+      </div>
+
+      <div class="p-section" style="padding:.6rem 0">
+        <div class="stat-row"><span class="sr-label">Starting value</span><span class="sr-val">1,000 CSPR</span></div>
+        <div class="stat-row"><span class="sr-label">Total trades</span><span class="sr-val" id="beta-trades">18</span></div>
+        <div class="stat-row"><span class="sr-label">Profitable trades</span><span class="sr-val down" id="beta-wins">6</span></div>
+        <div class="stat-row"><span class="sr-label">Win rate</span><span class="sr-val down" id="beta-wr">33.3%</span></div>
+        <div class="stat-row"><span class="sr-label">Last action</span><span class="sr-val" id="beta-last" style="color:var(--red)">SELL</span></div>
+        <div class="stat-row"><span class="sr-label">Network</span><span class="sr-val">Casper Testnet</span></div>
+      </div>
+
+      <!-- mini bars -->
+      <div class="p-section">
+        <div style="font-family:var(--font-m);font-size:9px;color:var(--w30);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem">Trade History</div>
+        <div class="mini-bars" id="beta-bars">
+          <div class="mini-bar" style="height:40%;background:var(--red)"></div>
+          <div class="mini-bar" style="height:60%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:55%;background:var(--w30)"></div>
+          <div class="mini-bar" style="height:35%;background:var(--red)"></div>
+          <div class="mini-bar" style="height:80%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:90%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:70%;background:var(--green)"></div>
+          <div class="mini-bar" style="height:95%;background:var(--green)"></div>
+        </div>
+      </div>
+
+      <!-- last decision -->
+      <div class="p-section">
+        <div class="decision-box">
+          <div class="db-label">Last AI Decision</div>
+          <span class="db-action db-hold" id="beta-action">Awaiting Match...</span>
+          <div class="db-reason" id="beta-reason">Agent has not executed any trades yet.</div>
+          <a href="#" class="db-hash" id="beta-hash" target="_blank" style="display:none;">tx: Awaiting...</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="settlement-overlay" id="settlement-overlay" aria-hidden="true">
+  <div class="settlement-modal" role="dialog" aria-modal="true" aria-labelledby="settlement-title">
+    <div class="settlement-kicker">settle_match() confirmed</div>
+    <div class="settlement-title" id="settlement-title">Alpha Wins</div>
+    <div class="settlement-scores">
+      <div class="settlement-score"><span>Alpha final</span><strong id="settle-alpha">1,247</strong></div>
+      <div class="settlement-score"><span>Beta final</span><strong id="settle-beta">967</strong></div>
+    </div>
+    <a class="settlement-link" id="settle-link" href="https://testnet.cspr.live" target="_blank" rel="noreferrer">View on CSPR.live</a>
+  </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <div class="bb-item"><span class="bb-label">Network</span><span class="bb-val">Casper Testnet</span></div>
+  <div class="bb-sep"></div>
+  <div class="bb-item"><span class="bb-label">CSPR/USDT</span><span class="bb-val green" id="bb-price">$0.0412</span></div>
+  <div class="bb-sep"></div>
+  <div class="bb-item"><span class="bb-label">Block</span><span class="bb-val amber" id="bb-block">3,847,201</span></div>
+  <div class="bb-sep"></div>
+  <div class="bb-item"><span class="bb-label">Leader</span><span class="bb-val green" id="bb-leader">α Alpha +24.7%</span></div>
+  <div class="bb-sep"></div>
+  <div class="bb-item"><span class="bb-label">Trades recorded</span><span class="bb-val" id="bb-trades">36</span></div>
+  <div class="bb-sep"></div>
+  <div class="bb-item"><span class="bb-label">SSE Status</span><span class="bb-val green">● Connected</span></div>
+  <div class="bb-sep"></div>
+  <div class="bb-item bb-contract">
+    <span class="bb-label">Contract</span>
+    <span class="bb-val" style="color:var(--violet-l)"><a href="https://testnet.cspr.live/deploy/f7a9bf79a9c8694dde2a5e1e6b725cead3bb5bc8a4fbb3bd15d05e2d0f9ae7e7" target="_blank" style="color:inherit; text-decoration:none;">contract-cf8ca…7cbb</a></span>
+  </div>
+
+<script>
+// ── STATE ──────────────────────────────────────────
+let alphaVal = 1000, betaVal = 1000;
+let blockNum = 0, blocksLeft = 0;
+let totalTrades = 0, alphaTrades = 0, betaTrades = 0;
+let alphaWins = 0, betaWins = 0;
+let startBudget = 1000000000000; // default 1000 CSPR (10^9 motes)
+let matchState = null;
+
+let chartLabels = [];
+let chartAlpha = [];
+let chartBeta = [];
+
+// ── CHART ──────────────────────────────────────────
+const ctx = document.getElementById('main-chart').getContext('2d');
+const startLinePlugin = {
+  id: 'startLine',
+  afterDraw(chart) {
+    const y = chart.scales.y.getPixelForValue(1000);
+    const { left, right } = chart.chartArea;
+    const context = chart.ctx;
+    context.save();
+    context.setLineDash([5, 5]);
+    context.strokeStyle = 'rgba(240,244,255,.28)';
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(left, y);
+    context.lineTo(right, y);
+    context.stroke();
+    context.fillStyle = 'rgba(240,244,255,.42)';
+    context.font = '10px JetBrains Mono';
+    context.fillText('START 1000 CSPR', left + 8, y - 6);
+    context.restore();
+  }
+};
+
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: chartLabels,
+    datasets: [
+      {
+        label: 'Alpha',
+        data: chartAlpha,
+        borderColor: '#7C3AED',
+        backgroundColor: 'rgba(124,58,237,.08)',
+        borderWidth: 2,
+        tension: .4,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+      },
+      {
+        label: 'Beta',
+        data: chartBeta,
+        borderColor: '#00E5CC',
+        backgroundColor: 'rgba(0,229,204,.05)',
+        borderWidth: 2,
+        tension: .4,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        borderDash: [4, 3],
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    animation: { duration: 300 },
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0A1228',
+        borderColor: 'rgba(240,244,255,.08)',
+        borderWidth: 1,
+        titleColor: 'rgba(240,244,255,.4)',
+        titleFont: { family: 'JetBrains Mono', size: 10 },
+        bodyFont: { family: 'JetBrains Mono', size: 11 },
+        bodyColor: '#F0F4FF',
+        padding: 10,
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(240,244,255,.04)' },
+        ticks: { color: 'rgba(240,244,255,.3)', font: { family: 'JetBrains Mono', size: 9 }, maxRotation: 0, maxTicksLimit: 6 }
+      },
+      y: {
+        grid: { color: 'rgba(240,244,255,.04)' },
+        ticks: { color: 'rgba(240,244,255,.3)', font: { family: 'JetBrains Mono', size: 9 } }
+      }
+    }
+  },
+  plugins: [startLinePlugin]
+});
+
+function updateVsBar() {
+  const total = alphaVal + betaVal;
+  const aPct = total > 0 ? ((alphaVal / total) * 100).toFixed(1) : '50.0';
+  const bPct = total > 0 ? ((betaVal / total) * 100).toFixed(1) : '50.0';
+  document.getElementById('vs-alpha').style.width = aPct + '%';
+  document.getElementById('vs-beta').style.width = bPct + '%';
+  document.getElementById('vs-alpha-pct').textContent = aPct + '%';
+  document.getElementById('vs-beta-pct').textContent = bPct + '%';
+}
+
+function formatCSPR(valueInMotes) {
+  return Math.round(valueInMotes / 1_000_000_000).toLocaleString();
+}
+
+function formatDelta(motesVal, startMotes) {
+  const diff = motesVal - startMotes;
+  const pct = ((diff / startMotes) * 100).toFixed(1);
+  return `${diff >= 0 ? '▲ +' : '▼ '}${Math.abs(pct)}%`;
+}
+
+function addTradeFeed(trade) {
+  const feed = document.getElementById('trade-feed');
+  const now = new Date(trade.blockTime * 1000 || Date.now()).toLocaleTimeString('en-GB', {hour12:false});
+  const item = document.createElement('div');
+  item.className = 'trade-item';
+  const isAlpha = trade.agentId === 'alpha';
+  
+  const badgeCls = trade.action === 'BUY' ? 'ti-buy' : trade.action === 'SELL' ? 'ti-sell' : 'ti-hold';
+  const csprVal = (trade.amount / 1_000_000_000).toFixed(1);
+  const deltaStr = trade.action === 'HOLD' ? 'No change' : `${trade.action === 'BUY' ? '+' : '-'}${csprVal} CSPR`;
+
+  item.innerHTML = `
+    <div class="ti-row1">
+      <span class="ti-time">${now}</span>
+      <span class="ti-agent ${isAlpha ? 'alpha' : 'beta'}">${isAlpha ? 'α Alpha' : 'β Beta'}</span>
+      <span class="ti-badge ${badgeCls}">${trade.action}</span>
+      <span class="ti-pair">CSPR/USDT</span>
+      <span class="onchain-tag">ON-CHAIN</span>
+    </div>
+    <div class="ti-row2">
+      <span class="ti-val">${deltaStr} · Portfolio: ${formatCSPR(trade.portfolioValue)}</span>
+      <a href="https://testnet.cspr.live/deploy/${trade.deployHash}" class="ti-hash" target="_blank">${trade.deployHash.slice(0, 6)}…${trade.deployHash.slice(-4)}</a>
+    </div>`;
+  feed.insertBefore(item, feed.firstChild);
+  if (feed.children.length > 20) feed.removeChild(feed.lastChild);
+}
+
+function addMatchLog(timeLabel, msg) {
+  const log = document.getElementById('match-log');
+  const item = document.createElement('div');
+  item.className = 'log-item';
+  item.innerHTML = `<span class="log-time">${timeLabel}</span><span class="log-msg">${msg}</span>`;
+  log.insertBefore(item, log.firstChild);
+  if (log.children.length > 12) log.removeChild(log.lastChild);
+}
+
+// Update live header / bottom bar prices dynamically
+async function updateCSPRPrice() {
+  try {
+    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=casper-network&vs_currencies=usd");
+    if (res.ok) {
+      const json = await res.json();
+      const price = json?.["casper-network"]?.usd;
+      if (price) {
+        document.getElementById('bb-price').textContent = '$' + price.toFixed(4);
+      }
+    }
+  } catch {
+    // ignore
+  }
+}
+setInterval(updateCSPRPrice, 30_000);
+updateCSPRPrice();
+
+// Render initial/updated UI states
+function renderState() {
+  if (!matchState) return;
+
+  startBudget = matchState.startBudget;
+  alphaVal = matchState.valueA;
+  betaVal = matchState.valueB;
+
+  // Header Values
+  document.getElementById('hdr-alpha').textContent = formatCSPR(alphaVal);
+  document.getElementById('hdr-beta').textContent = formatCSPR(betaVal);
+
+  // Left Panel Alpha
+  document.getElementById('alpha-val').textContent = formatCSPR(alphaVal) + ' CSPR';
+  const alphaDeltaVal = formatDelta(alphaVal, startBudget);
+  document.getElementById('alpha-delta').textContent = `${alphaDeltaVal} from start`;
+  document.getElementById('alpha-delta').style.color = alphaVal >= startBudget ? 'var(--green)' : 'var(--red)';
+
+  // Right Panel Beta
+  document.getElementById('beta-val').textContent = formatCSPR(betaVal) + ' CSPR';
+  const betaDeltaVal = formatDelta(betaVal, startBudget);
+  document.getElementById('beta-delta').textContent = `${betaDeltaVal} from start`;
+  document.getElementById('beta-delta').style.color = betaVal >= startBudget ? 'var(--green)' : 'var(--red)';
+
+  // Timer & Blocks progress
+  const duration = matchState.endBlock - matchState.startBlock;
+  const currentProgressBlock = Math.max(0, blockNum - matchState.startBlock);
+  blocksLeft = Math.max(0, matchState.endBlock - blockNum);
+  const progressPct = duration > 0 ? Math.min(100, Math.round((currentProgressBlock / duration) * 100)) : 0;
+
+  document.getElementById('block-num').textContent = blockNum.toLocaleString();
+  document.getElementById('timer-blocks').textContent = blocksLeft;
+  document.getElementById('timer-blocks').className = 'timer-val' + (blocksLeft < 5 ? ' urgent' : '');
+  document.getElementById('timer-trades').textContent = matchState.tradeCount;
+  document.getElementById('pb-pct').textContent = progressPct + '%';
+  document.getElementById('pb-fill').style.width = progressPct + '%';
+
+  // Header Match ID
+  const matchIdEl = document.getElementById('hdr-match-id');
+  if (matchIdEl) matchIdEl.textContent = `#${matchState.id}`;
+
+  // VS bar names
+  document.getElementById('vs-alpha-name').textContent = `α Alpha · ${formatCSPR(alphaVal)} CSPR`;
+  document.getElementById('vs-beta-name').textContent = `${formatCSPR(betaVal)} CSPR · Beta β`;
+
+  // Bottom Bar
+  document.getElementById('bb-block').textContent = blockNum.toLocaleString();
+  document.getElementById('bb-trades').textContent = matchState.tradeCount;
+  
+  const leader = alphaVal >= betaVal ? 'α Alpha' : 'β Beta';
+  const leadVal = alphaVal >= betaVal ? alphaVal : betaVal;
+  document.getElementById('bb-leader').textContent = `${leader} ${formatDelta(leadVal, startBudget)}`;
+  document.getElementById('bb-leader').style.color = alphaVal >= betaVal ? 'var(--violet-l)' : 'var(--teal)';
+
+  // Update Split percentage
+  updateVsBar();
+
+  // Handle Match Settlement Overlay
+  if (matchState.status === 'settled') {
+    const winnerName = matchState.valueA === matchState.valueB 
+      ? 'Draw' 
+      : matchState.valueA > matchState.valueB ? 'Alpha Wins' : 'Beta Wins';
+    const color = matchState.valueA === matchState.valueB 
+      ? 'var(--w60)' 
+      : matchState.valueA > matchState.valueB ? 'var(--violet-l)' : 'var(--teal)';
+
+    document.getElementById('settlement-title').textContent = winnerName;
+    document.getElementById('settlement-title').style.color = color;
+    document.getElementById('settle-alpha').textContent = formatCSPR(matchState.valueA) + ' CSPR';
+    document.getElementById('settle-beta').textContent = formatCSPR(matchState.valueB) + ' CSPR';
+    
+    const settleLink = document.getElementById('settle-link');
+    if (settleLink && matchState.settleDeployHash) {
+      settleLink.href = `https://testnet.cspr.live/deploy/${matchState.settleDeployHash}`;
+    }
+    
+    document.getElementById('settlement-overlay').classList.add('show');
+    document.getElementById('settlement-overlay').setAttribute('aria-hidden', 'false');
+  } else {
+    document.getElementById('settlement-overlay').classList.remove('show');
+    document.getElementById('settlement-overlay').setAttribute('aria-hidden', 'true');
+  }
+}
+
+// Fetch Initial Database state & Setup SSE Event listeners
+async function bootstrap() {
+  // Clear displays
+  document.getElementById('trade-feed').innerHTML = '';
+  document.getElementById('match-log').innerHTML = '';
+
+  // Hide settlement overlay
+  const overlay = document.getElementById('settlement-overlay');
+  if (overlay) overlay.classList.remove('active');
+
+  // Reset decision boxes
+  const alphaAction = document.getElementById('alpha-action');
+  if (alphaAction) {
+    alphaAction.textContent = 'Awaiting Match...';
+    alphaAction.className = 'db-action db-hold';
+    document.getElementById('alpha-reason').textContent = 'Agent has not executed any trades yet.';
+    document.getElementById('alpha-hash').style.display = 'none';
+  }
+  const betaAction = document.getElementById('beta-action');
+  if (betaAction) {
+    betaAction.textContent = 'Awaiting Match...';
+    betaAction.className = 'db-action db-hold';
+    document.getElementById('beta-reason').textContent = 'Agent has not executed any trades yet.';
+    document.getElementById('beta-hash').style.display = 'none';
+  }
+
+  // Get active match state
+  const matchRes = await fetch('/api/match');
+  if (!matchRes.ok) return;
+  const matchType = matchRes.headers.get("content-type");
+  if (!matchType || !matchType.includes("application/json")) {
+    console.warn("Expected JSON response from /api/match, received: ", matchType);
+    return;
+  }
+  matchState = await matchRes.json();
+  if (!matchState || !matchState.id) return;
+
+  // Get past events
+  const eventsRes = await fetch('/api/events');
+  if (eventsRes.ok) {
+    const eventsType = eventsRes.headers.get("content-type");
+    if (eventsType && eventsType.includes("application/json")) {
+      const events = await eventsRes.json();
+      processPastEvents(events);
+    }
+  }
+
+  renderState();
+  initSSE();
+}
+
+function processPastEvents(events) {
+  chartLabels = [];
+  chartAlpha = [];
+  chartBeta = [];
+
+  alphaTrades = 0;
+  betaTrades = 0;
+  alphaWins = 0;
+  betaWins = 0;
+
+  const alphaBars = document.getElementById('alpha-bars');
+  const betaBars = document.getElementById('beta-bars');
+  if (alphaBars) alphaBars.innerHTML = '';
+  if (betaBars) betaBars.innerHTML = '';
+
+  events.forEach((event) => {
+    if (event.matchId === matchState.id) {
+      handleEvent(event, false);
+    }
+  });
+
+  chart.data.labels = chartLabels;
+  chart.data.datasets[0].data = chartAlpha;
+  chart.data.datasets[1].data = chartBeta;
+  chart.update();
+}
+
+function handleEvent(event, triggerRender = true) {
+  const payload = event.payload;
+  
+  if (event.type === 'match_created') {
+    blockNum = payload.startBlock || blockNum;
+    addMatchLog('CREATED', `Match #${payload.id} created on Casper Testnet.`);
+  } 
+  
+  else if (event.type === 'match_started') {
+    blockNum = payload.startBlock || blockNum;
+    addMatchLog('STARTED', `Match #${payload.id} starts at Block ${blockNum}.`);
+  } 
+  
+  else if (event.type === 'trade_recorded') {
+    blockNum = payload.blockTime || blockNum;
+    const isAlpha = payload.agentId === 'alpha';
+    const cleanTime = new Date(payload.blockTime * 1000 || Date.now()).toLocaleTimeString('en-GB', {hour12:false});
+    
+    // Update Trade History mini-bars
+    const barsContainer = document.getElementById(`${payload.agentId}-bars`);
+    if (barsContainer) {
+      const bar = document.createElement('div');
+      bar.className = 'mini-bar';
+      if (payload.action === 'BUY') {
+        bar.style.height = '80%';
+        bar.style.background = 'var(--green)';
+      } else if (payload.action === 'SELL') {
+        bar.style.height = '60%';
+        bar.style.background = 'var(--red)';
+      } else {
+        bar.style.height = '35%';
+        bar.style.background = 'var(--w30)';
+      }
+      barsContainer.appendChild(bar);
+      if (barsContainer.children.length > 10) {
+        barsContainer.removeChild(barsContainer.firstChild);
+      }
+    }
+
+    if (isAlpha) {
+      alphaTrades++;
+      if (payload.action === 'BUY') alphaWins++;
+      
+      // Update Agent Left Column Details
+      document.getElementById('alpha-trades').textContent = alphaTrades;
+      document.getElementById('alpha-wins').textContent = alphaWins;
+      document.getElementById('alpha-wr').textContent = alphaTrades > 0 ? ((alphaWins / alphaTrades) * 100).toFixed(1) + '%' : '0.0%';
+      document.getElementById('alpha-last').textContent = payload.action;
+      document.getElementById('alpha-action').textContent = `${payload.action === 'BUY' ? '↑' : payload.action === 'SELL' ? '↓' : '—'} ${payload.action}`;
+      document.getElementById('alpha-action').className = `db-action db-${payload.action.toLowerCase()}`;
+      document.getElementById('alpha-reason').textContent = payload.reasoning || '';
+      
+      const hashLink = document.getElementById('alpha-hash');
+      if (hashLink) {
+        hashLink.textContent = `tx: ${payload.deployHash.slice(0, 12)}…${payload.deployHash.slice(-4)}`;
+        hashLink.href = `https://testnet.cspr.live/deploy/${payload.deployHash}`;
+        hashLink.style.display = 'block';
+      }
+    } else {
+      betaTrades++;
+      if (payload.action === 'BUY') betaWins++;
+      
+      // Update Agent Right Column Details
+      document.getElementById('beta-trades').textContent = betaTrades;
+      document.getElementById('beta-wins').textContent = betaWins;
+      document.getElementById('beta-wr').textContent = betaTrades > 0 ? ((betaWins / betaTrades) * 100).toFixed(1) + '%' : '0.0%';
+      document.getElementById('beta-last').textContent = payload.action;
+      document.getElementById('beta-action').textContent = `${payload.action === 'BUY' ? '↑' : payload.action === 'SELL' ? '↓' : '—'} ${payload.action}`;
+      document.getElementById('beta-action').className = `db-action db-${payload.action.toLowerCase()}`;
+      document.getElementById('beta-reason').textContent = payload.reasoning || '';
+      
+      const hashLink = document.getElementById('beta-hash');
+      if (hashLink) {
+        hashLink.textContent = `tx: ${payload.deployHash.slice(0, 12)}…${payload.deployHash.slice(-4)}`;
+        hashLink.href = `https://testnet.cspr.live/deploy/${payload.deployHash}`;
+        hashLink.style.display = 'block';
+      }
+    }
+
+    addTradeFeed(payload);
+    addMatchLog(cleanTime, `Agent ${isAlpha ? 'Alpha' : 'Beta'} performed ${payload.action} for ${formatCSPR(payload.amount)} CSPR.`);
+
+    // Push into Live Chart Data
+    chartLabels.push('B' + blockNum);
+    chartAlpha.push(Math.round(payload.agentId === 'alpha' ? payload.portfolioValue / 1_000_000_000 : alphaVal / 1_000_000_000));
+    chartBeta.push(Math.round(payload.agentId === 'beta' ? payload.portfolioValue / 1_000_000_000 : betaVal / 1_000_000_000));
+    if (chartLabels.length > 30) {
+      chartLabels.shift(); chartAlpha.shift(); chartBeta.shift();
+    }
+    
+    if (triggerRender) {
+      chart.update();
+    }
+  } 
+  
+  else if (event.type === 'match_settled') {
+    blockNum = payload.endBlock || blockNum;
+    addMatchLog('SETTLED', `Match settled. Verification confirmed on-chain.`);
+  }
+
+  if (triggerRender && matchState) {
+    // Dynamically query latest match state to align values
+    fetch('/api/match').then(r => r.json()).then(latest => {
+      matchState = latest;
+      renderState();
+    });
+  }
+}
+
+let sseSource = null;
+
+// Stream SSE Events
+function initSSE() {
+  if (sseSource) {
+    sseSource.close();
+  }
+  sseSource = new EventSource('/events');
+  
+  sseSource.addEventListener('match_created', (e) => {
+    const ev = JSON.parse(e.data);
+    if (matchState && ev.matchId > matchState.id) {
+      console.log("New match detected! Restarting dashboard...", ev.matchId);
+      bootstrap();
+      return;
+    }
+    if (!matchState || ev.matchId === matchState.id) {
+      handleEvent(ev);
+    }
+  });
+  sseSource.addEventListener('match_started', (e) => {
+    const ev = JSON.parse(e.data);
+    if (matchState && ev.matchId > matchState.id) {
+      console.log("New match detected! Restarting dashboard...", ev.matchId);
+      bootstrap();
+      return;
+    }
+    if (!matchState || ev.matchId === matchState.id) {
+      handleEvent(ev);
+    }
+  });
+  sseSource.addEventListener('trade_recorded', (e) => {
+    const ev = JSON.parse(e.data);
+    if (matchState && ev.matchId > matchState.id) {
+      console.log("New match detected! Restarting dashboard...", ev.matchId);
+      bootstrap();
+      return;
+    }
+    if (!matchState || ev.matchId === matchState.id) {
+      handleEvent(ev);
+    }
+  });
+  sseSource.addEventListener('match_settled', (e) => {
+    const ev = JSON.parse(e.data);
+    if (matchState && ev.matchId > matchState.id) {
+      console.log("New match detected! Restarting dashboard...", ev.matchId);
+      bootstrap();
+      return;
+    }
+    if (!matchState || ev.matchId === matchState.id) {
+      handleEvent(ev);
+    }
+  });
+
+  sseSource.onerror = (err) => {
+    console.error("SSE stream disconnected or failed. Re-initiating in 5s...", err);
+  };
+}
+
+bootstrap();
+</script>
+</body>
+</html>

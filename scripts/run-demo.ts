@@ -5,7 +5,7 @@ import { agentAccount, loadConfig } from "../agents/shared/config.js";
 import { sha256 } from "../agents/shared/hash.js";
 
 console.log("🚀 Starting Arena Spectator Server...");
-const spectator = spawn("npx", ["tsx", "spectator/server.ts"], {
+const spectator = spawn("npx", ["tsx", "api/server.ts"], {
   stdio: "inherit",
   shell: true
 });
