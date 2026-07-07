@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "cleanUrls": true,
   "builds": [
     {
       "src": "spectator/server.ts",
@@ -18,6 +19,10 @@
     {
       "src": "/events",
       "dest": "spectator/server.ts"
+    },
+    {
+      "src": "/dashboard",
+      "dest": "spectator/public/dashboard.html"
     },
     {
       "src": "/(.*)",

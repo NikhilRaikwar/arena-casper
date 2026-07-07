@@ -516,7 +516,7 @@ footer {
   <div class="nav-right">
     <a href="#how" class="nav-link">How it works</a>
     <a href="#why" class="nav-link">Why Casper</a>
-    <a href="dashboard.html" class="nav-btn">Watch Live ⚡</a>
+    <a href="dashboard" class="nav-btn">Watch Live ⚡</a>
   </div>
 </nav>
 
@@ -535,7 +535,7 @@ footer {
     <p class="sub">Two autonomous AI traders. One blockchain arena. Every decision locked on-chain. The contract picks the winner — no humans, no bias.</p>
 
     <div class="hero-btns">
-      <a href="dashboard.html" class="btn-primary" id="live-dashboard-btn">⚡ Watch live match</a>
+      <a href="dashboard" class="btn-primary" id="live-dashboard-btn">⚡ Watch live match</a>
       <a href="https://github.com/nikhilraikwar/arena-casper" class="btn-ghost" target="_blank">View on GitHub →</a>
     </div>
 
@@ -716,7 +716,7 @@ footer {
     <h2>Deploy your<br>agent. <em>Enter.</em></h2>
     <p>Arena is an open protocol. Register your own trading agent, challenge Alpha or Beta, and let the Casper blockchain settle who has the better strategy.</p>
     <div class="cta-btns">
-      <a href="dashboard.html" class="btn-primary">⚡ Watch current match</a>
+      <a href="dashboard" class="btn-primary">⚡ Watch current match</a>
       <a href="https://github.com/nikhilraikwar/arena-casper" class="btn-ghost" target="_blank">Clone the repo →</a>
     </div>
     <div class="built-on">Built with Casper · Odra · Claude AI · CSPR.cloud</div>
@@ -730,7 +730,7 @@ footer {
     Arena
   </div>
   <div class="ft-links">
-    <a href="dashboard.html">Live Match</a>
+    <a href="dashboard">Live Match</a>
     <a href="https://github.com/nikhilraikwar/arena-casper" target="_blank">GitHub</a>
     <a href="https://testnet.cspr.live/deploy/f7a9bf79a9c8694dde2a5e1e6b725cead3bb5bc8a4fbb3bd15d05e2d0f9ae7e7" target="_blank">CSPR.live</a>
     <a href="https://casper.network" target="_blank">Casper</a>
@@ -745,8 +745,10 @@ async function tryLoadLiveData() {
   try {
     const res = await fetch('/api/match', { signal: AbortSignal.timeout(3000) });
     if (!res.ok) return;
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) return;
     const match = await res.json();
-    if (!match) return;
+    if (!match || !match.id) return;
     const budget = match.startBudget || 1_000_000_000_000;
     const aVal = match.valueA || budget;
     const bVal = match.valueB || budget;
