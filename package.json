@@ -29,6 +29,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
+    "@vercel/analytics": "^2.0.1",
     "casper-js-sdk": "^5.0.12",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
