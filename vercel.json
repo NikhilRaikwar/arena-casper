@@ -22,11 +22,11 @@
     },
     {
       "src": "/dashboard",
-      "dest": "spectator/public/dashboard.html"
+      "dest": "/dashboard.html"
     },
     {
       "src": "/(.*)",
-      "dest": "spectator/public/$1"
+      "dest": "/$1"
     }
   ]
 }
