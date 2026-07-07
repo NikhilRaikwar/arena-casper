@@ -1076,6 +1076,26 @@ async function bootstrap() {
   document.getElementById('trade-feed').innerHTML = '';
   document.getElementById('match-log').innerHTML = '';
 
+  // Hide settlement overlay
+  const overlay = document.getElementById('settlement-overlay');
+  if (overlay) overlay.classList.remove('active');
+
+  // Reset decision boxes
+  const alphaAction = document.getElementById('alpha-action');
+  if (alphaAction) {
+    alphaAction.textContent = 'Awaiting Match...';
+    alphaAction.className = 'db-action db-hold';
+    document.getElementById('alpha-reason').textContent = 'Agent has not executed any trades yet.';
+    document.getElementById('alpha-hash').style.display = 'none';
+  }
+  const betaAction = document.getElementById('beta-action');
+  if (betaAction) {
+    betaAction.textContent = 'Awaiting Match...';
+    betaAction.className = 'db-action db-hold';
+    document.getElementById('beta-reason').textContent = 'Agent has not executed any trades yet.';
+    document.getElementById('beta-hash').style.display = 'none';
+  }
+
   // Get active match state
   const matchRes = await fetch('/api/match');
   if (!matchRes.ok) return;
@@ -1237,36 +1257,61 @@ function handleEvent(event, triggerRender = true) {
   }
 }
 
+let sseSource = null;
+
 // Stream SSE Events
 function initSSE() {
-  const source = new EventSource('/events');
+  if (sseSource) {
+    sseSource.close();
+  }
+  sseSource = new EventSource('/events');
   
-  source.addEventListener('match_created', (e) => {
+  sseSource.addEventListener('match_created', (e) => {
     const ev = JSON.parse(e.data);
+    if (matchState && ev.matchId > matchState.id) {
+      console.log("New match detected! Restarting dashboard...", ev.matchId);
+      bootstrap();
+      return;
+    }
     if (!matchState || ev.matchId === matchState.id) {
       handleEvent(ev);
     }
   });
-  source.addEventListener('match_started', (e) => {
+  sseSource.addEventListener('match_started', (e) => {
     const ev = JSON.parse(e.data);
+    if (matchState && ev.matchId > matchState.id) {
+      console.log("New match detected! Restarting dashboard...", ev.matchId);
+      bootstrap();
+      return;
+    }
     if (!matchState || ev.matchId === matchState.id) {
       handleEvent(ev);
     }
   });
-  source.addEventListener('trade_recorded', (e) => {
+  sseSource.addEventListener('trade_recorded', (e) => {
     const ev = JSON.parse(e.data);
+    if (matchState && ev.matchId > matchState.id) {
+      console.log("New match detected! Restarting dashboard...", ev.matchId);
+      bootstrap();
+      return;
+    }
     if (!matchState || ev.matchId === matchState.id) {
       handleEvent(ev);
     }
   });
-  source.addEventListener('match_settled', (e) => {
+  sseSource.addEventListener('match_settled', (e) => {
     const ev = JSON.parse(e.data);
+    if (matchState && ev.matchId > matchState.id) {
+      console.log("New match detected! Restarting dashboard...", ev.matchId);
+      bootstrap();
+      return;
+    }
     if (!matchState || ev.matchId === matchState.id) {
       handleEvent(ev);
     }
   });
 
-  source.onerror = (err) => {
+  sseSource.onerror = (err) => {
     console.error("SSE stream disconnected or failed. Re-initiating in 5s...", err);
   };
 }
