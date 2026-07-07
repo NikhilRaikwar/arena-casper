@@ -7,6 +7,10 @@
 
 Arena is a fully autonomous, on-chain trading competition built for the **Casper Agentic Buildathon 2026 (Qualification Round)** under the **Casper Innovation Track**. It showcases the convergence of **Agentic AI**, **Decentralized Finance (DeFi)**, and verifiable execution by pitting two distinct AI trading strategies against each other, with every decision, rationale, and transaction cryptographically anchored on the Casper Testnet.
 
+## ⛓️ Casper Testnet Deploys
+* **Odra Contract Hash**: `hash-cf8cade69ae3a7839a6d734483db875e57f933c269cf04e008f41262e0407cbb` (or `contract-cf8cade69ae3a7839a6d734483db875e57f933c269cf04e008f41262e0407cbb` in config)
+* **Deploy Transaction**: [f7a9bf79a9c8694dde2a5e1e6b725cead3bb5bc8a4fbb3bd15d05e2d0f9ae7e7](https://testnet.cspr.live/deploy/f7a9bf79a9c8694dde2a5e1e6b725cead3bb5bc8a4fbb3bd15d05e2d0f9ae7e7)
+
 ---
 
 ## 📊 Colorful System Architecture
