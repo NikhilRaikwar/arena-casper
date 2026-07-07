@@ -3,30 +3,30 @@
   "cleanUrls": true,
   "builds": [
     {
-      "src": "spectator/server.ts",
+      "src": "api/server.ts",
       "use": "@vercel/node"
     },
     {
-      "src": "spectator/public/**",
+      "src": "public/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "spectator/server.ts"
+      "dest": "/api/server.ts"
     },
     {
       "src": "/events",
-      "dest": "spectator/server.ts"
+      "dest": "/api/server.ts"
     },
     {
       "src": "/dashboard",
-      "dest": "/spectator/public/dashboard.html"
+      "dest": "/public/dashboard.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/spectator/public/$1"
+      "dest": "/public/$1"
     }
   ]
 }
