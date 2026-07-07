@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.arena/
+.env
+contracts/arena/target/
+*.log
+
+# Private key material — NEVER commit
+keys/
+*.pem
+*.private
+
+# Stale root-level HTML artefacts (not part of the deployable app)
+"dashboard (4).html"
+"landing (5).html"
+casper-attached-ideas-validation.html
+casper-winning-ideas-landscape.html
+arena_complete_build_plan.html

@@ -1,0 +1,42 @@
+{
+  "name": "arena-on-casper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Verifiable AI agent trading league MVP for Casper Agentic Buildathon 2026.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "npm run build",
+    "test": "npm run build && cargo test --manifest-path contracts/arena/Cargo.toml",
+    "demo": "node dist/scripts/run-demo.js",
+    "demo:all": "tsx scripts/run-demo.ts",
+    "agent:alpha": "node dist/agents/alpha/index.js",
+    "agent:beta": "node dist/agents/beta/index.js",
+    "verifier": "node dist/scripts/settle-match.js",
+    "spectator": "node dist/spectator/server.js",
+    "dev:spectator": "tsx spectator/server.ts",
+    "dev:demo": "tsx scripts/run-demo.ts",
+    "live:check": "tsx scripts/check-live-readiness.ts",
+    "live:deploy": "tsx scripts/live-deploy-contract.ts",
+    "live:create": "tsx scripts/live-create-match.ts",
+    "live:start": "tsx scripts/live-start-match.ts",
+    "live:run": "tsx scripts/live-run-match.ts",
+    "live:settle": "tsx scripts/live-settle-match.ts",
+    "contract:build": "bash scripts/odra-build.sh",
+    "setup:testnet": "bash scripts/setup-testnet.sh"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "casper-js-sdk": "^5.0.12",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "binaryen": "^130.0.0"
+  }
+}
