@@ -244,16 +244,6 @@ The public landing page and dashboard load the official CSPR.click client at run
 | Technical rigor | Caller restrictions, verifier-only timed settlement, atomic evidence/cache writes, retries, and deploy finality checks |
 | Demo quality | Live SSE dashboard, evidence links, deploy links, and a complete Testnet lifecycle |
 
-## Demo Script
-
-1. Open the hosted landing page and connect a Testnet wallet through CSPR.click.
-2. Open the Match 19 dashboard, show Beta's winning settled result, the 25 confirmed decisions, and the evidence-backed trade feed.
-3. Open the CSPR.live pages for Match 19 `create_match`, Alpha's BUY and SELL decisions, a Beta decision, and `settle_match`.
-4. Show `contracts/arena/src/odra_contract.rs` and explain the registered-agent caller checks, verifier-only timed settlement, and on-chain winner selection.
-5. Open the Match 19 Alpha SELL evidence JSON, then return to the settled overlay and its settlement proof.
-
-Record a new final-round video using the hosted V2 application and the completed Match 19 lifecycle. A qualification-round recording that shows the previous contract or historical placeholder content is not suitable evidence for this submission.
-
 ## Verification
 
 ```bash
