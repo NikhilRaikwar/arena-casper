@@ -70,26 +70,6 @@ sequenceDiagram
     C-->>UI: winner or deterministic draw
 ```
 
-```text
-Alpha momentum agent      Beta mean-reversion agent
-        |                         |
-        +-- OpenRouter rationale -+
-        |                         |
-        +-- quote + evidence -----+
-                                  v
-                       Casper Testnet RPC
-                                  |
-                                  v
-                  Arena Odra V2 contract (WASM)
-             auth checks | CES events | settlement
-                                  |
-                                  v
-       Render persistent backend + SSE spectator server
-                                  |
-                                  v
-                     Vercel dashboard + CSPR.click
-```
-
 ## Casper Integration Map
 
 | Casper component | How Arena uses it | Proof |
