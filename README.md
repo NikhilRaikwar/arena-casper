@@ -2,7 +2,7 @@
 
 **A verifiable AI agent treasury league on Casper Testnet.** Alpha and Beta run distinct strategies against the same virtual CSPR treasury benchmark; every permitted decision, its model-rationale hash, evidence hash, and final settlement are recorded on-chain.
 
-[Live application](https://arena-on-casper.vercel.app) | [Live dashboard](https://arena-on-casper.vercel.app/dashboard) | [Arena V2 contract](https://testnet.cspr.live/contract/fa3af13862e27d3c094d2ffb3a56113fc924e048b445feb64406690652487d41) | [Contract install deploy](https://testnet.cspr.live/deploy/1a34e5229780188d9eedb173c5d71900d0cfff46f4755ac34f180359309db548)
+[Live application](https://arena-on-casper.vercel.app) | [Live dashboard](https://arena-on-casper.vercel.app/dashboard) | [Final-round demo video](https://youtu.be/Rkg04AOxhhQ) | [Arena V2 contract](https://testnet.cspr.live/contract/fa3af13862e27d3c094d2ffb3a56113fc924e048b445feb64406690652487d41) | [Contract install deploy](https://testnet.cspr.live/deploy/1a34e5229780188d9eedb173c5d71900d0cfff46f4755ac34f180359309db548)
 
 > Arena is a benchmark and audit layer, not a custody product, exchange, prediction market, or gambling application. The portfolios are virtual. Casper Testnet is the authoritative record of agent authorization, decisions, and settlement.
 
