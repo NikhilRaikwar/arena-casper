@@ -2,7 +2,7 @@
 
 **A verifiable AI agent treasury league on Casper Testnet.** Alpha and Beta run distinct strategies against the same virtual CSPR treasury benchmark; every permitted decision, its model-rationale hash, evidence hash, and final settlement are recorded on-chain.
 
-[Live application](https://arena-on-casper.vercel.app) | [Live dashboard](https://arena-on-casper.vercel.app/dashboard) | [V2 contract deployment](https://testnet.cspr.live/deploy/1a34e5229780188d9eedb173c5d71900d0cfff46f4755ac34f180359309db548)
+[Live application](https://arena-on-casper.vercel.app) | [Live dashboard](https://arena-on-casper.vercel.app/dashboard) | [Arena V2 contract](https://testnet.cspr.live/contract/fa3af13862e27d3c094d2ffb3a56113fc924e048b445feb64406690652487d41) | [Contract install deploy](https://testnet.cspr.live/deploy/1a34e5229780188d9eedb173c5d71900d0cfff46f4755ac34f180359309db548)
 
 > Arena is a benchmark and audit layer, not a custody product, exchange, prediction market, or gambling application. The portfolios are virtual. Casper Testnet is the authoritative record of agent authorization, decisions, and settlement.
 
@@ -105,11 +105,12 @@ Arena does **not** currently use CSPR.cloud streaming, CSPR.trade MCP, x402, the
 
 ## Final Round Proofs
 
-Active V2 contract: `contract-fa3af13862e27d3c094d2ffb3a56113fc924e048b445feb64406690652487d41`.
+Active V2 contract: [`contract-fa3af13862e27d3c094d2ffb3a56113fc924e048b445feb64406690652487d41`](https://testnet.cspr.live/contract/fa3af13862e27d3c094d2ffb3a56113fc924e048b445feb64406690652487d41).
 
 | Transaction | Entry point | CSPR.live proof |
 |---|---|---|
-| Contract deployed | Odra WASM install | [open](https://testnet.cspr.live/deploy/1a34e5229780188d9eedb173c5d71900d0cfff46f4755ac34f180359309db548) |
+| Arena V2 contract | Contract explorer | [open](https://testnet.cspr.live/contract/fa3af13862e27d3c094d2ffb3a56113fc924e048b445feb64406690652487d41) |
+| Contract installed | Odra WASM install deploy | [open](https://testnet.cspr.live/deploy/1a34e5229780188d9eedb173c5d71900d0cfff46f4755ac34f180359309db548) |
 | Match 3 settled (draw) | `settle_match()` | [open](https://testnet.cspr.live/deploy/6f83f9f6655a7c749998d13ffccbe25e8ed07e1187d45f4dcbe1607bc10140c8) |
 | Live Match 19 created | `create_match()` | [open](https://testnet.cspr.live/deploy/2dd66bf549d22e1de3dc6b022586ad9c32126dc4fe24d3314762547f59d18dbe) |
 | Live Match 19 started | `start_match()` | [open](https://testnet.cspr.live/deploy/206f88d35390c4345542de735488355f4407f45580594cdca1b2cae8628276cb) |
