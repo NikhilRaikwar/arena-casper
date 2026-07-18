@@ -114,8 +114,10 @@ Active V2 contract: [`contract-fa3af13862e27d3c094d2ffb3a56113fc924e048b445feb64
 | Match 3 settled (draw) | `settle_match()` | [open](https://testnet.cspr.live/deploy/6f83f9f6655a7c749998d13ffccbe25e8ed07e1187d45f4dcbe1607bc10140c8) |
 | Live Match 19 created | `create_match()` | [open](https://testnet.cspr.live/deploy/2dd66bf549d22e1de3dc6b022586ad9c32126dc4fe24d3314762547f59d18dbe) |
 | Live Match 19 started | `start_match()` | [open](https://testnet.cspr.live/deploy/206f88d35390c4345542de735488355f4407f45580594cdca1b2cae8628276cb) |
-| Live Match 19 Alpha decision | `record_trade()` | [open](https://testnet.cspr.live/deploy/0ecd580d07888138d73daa14427458faa9bdccf9592cfdb84109a14d0b05fee1) |
-| Live Match 19 Beta decision | `record_trade()` | [open](https://testnet.cspr.live/deploy/335730cd588cab8b8989e7fd3459423fb46704dbc1629c62ddfc60417b3e9726) |
+| Live Match 19 Alpha BUY | `record_trade()` | [open](https://testnet.cspr.live/deploy/e2eed1407ca42d731f35297cfaa573e7fe176285e9d65c0d9110adde4489ab49) |
+| Live Match 19 Alpha SELL | `record_trade()` | [open](https://testnet.cspr.live/deploy/e03cbdf37e65571159c3ea3fded8250eaac333d9919c76745ec8b1a6bf0477b2) |
+| Live Match 19 Beta decision | `record_trade()` | [open](https://testnet.cspr.live/deploy/2b630330d46e10dbf0969256db8c39e9d717e5758ebb9f71063ee9e2112d52cd) |
+| Live Match 19 settled: Beta wins | `settle_match()` | [open](https://testnet.cspr.live/deploy/e326f3a2afb9332a05bc3625e9cdd818277afa2814d472640e12e440a594d2dd) |
 
 The dashboard exposes the JSON evidence behind each recent decision at `/api/evidence/<evidence_hash>`. It includes the quote payload, model response, guard result, and pre-trade virtual portfolio. The chain contains only hashes, which keeps the on-chain record compact and tamper-evident.
 
@@ -245,12 +247,12 @@ The public landing page and dashboard load the official CSPR.click client at run
 ## Demo Script
 
 1. Open the hosted landing page and connect a Testnet wallet through CSPR.click.
-2. Open the dashboard and show the active live match, agent portfolios, model rationale evidence, and the confirmed deploy feed.
-3. Open the CSPR.live pages for `create_match`, both agent `record_trade` deploys, and a completed `settle_match`.
-4. Show the Odra entry points and explain that the verifier cannot choose the winner or settle early.
-5. Close with the settled overlay and the evidence JSON for the final decision.
+2. Open the Match 19 dashboard, show Beta's winning settled result, the 25 confirmed decisions, and the evidence-backed trade feed.
+3. Open the CSPR.live pages for Match 19 `create_match`, Alpha's BUY and SELL decisions, a Beta decision, and `settle_match`.
+4. Show `contracts/arena/src/odra_contract.rs` and explain the registered-agent caller checks, verifier-only timed settlement, and on-chain winner selection.
+5. Open the Match 19 Alpha SELL evidence JSON, then return to the settled overlay and its settlement proof.
 
-Record a new final-round video using the hosted V2 application, a current live match, and the V2 contract proof links. A qualification-round recording that shows the previous contract or historical placeholder content is not suitable evidence for this submission.
+Record a new final-round video using the hosted V2 application and the completed Match 19 lifecycle. A qualification-round recording that shows the previous contract or historical placeholder content is not suitable evidence for this submission.
 
 ## Verification
 

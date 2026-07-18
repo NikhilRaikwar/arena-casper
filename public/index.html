@@ -545,7 +545,7 @@ footer {
     <div class="scoreboard">
       <div class="sb-header">
         <span class="sb-title">Match #19 · CSPR/USD · Casper Testnet</span>
-        <span class="sb-live" id="sb-status-pill">ACTIVE</span>
+        <span class="sb-live" id="sb-status-pill">SETTLED</span>
       </div>
 
       <div class="sb-body">
@@ -567,8 +567,8 @@ footer {
         <!-- Virtual-portfolio values start at 1,000 CSPR per agent. -->
         <div class="score-row">
           <div class="score-left">
-            <span class="score-num up" id="alpha-score">1,000</span>
-            <span class="score-delta up" id="alpha-delta">▲ +0.0%</span>
+            <span class="score-num dn" id="alpha-score">999.31</span>
+            <span class="score-delta dn" id="alpha-delta">▼ -0.1%</span>
           </div>
           <div class="score-mid">
             <span class="score-label">CSPR</span>
@@ -585,32 +585,32 @@ footer {
           <div class="vs-bar-b" id="bar-b" style="width:50%"></div>
         </div>
 
-        <!-- Confirmed Testnet decisions from Live Match #19. -->
+        <!-- Completed Match #19 proof fallback. -->
         <div class="feed-header">Confirmed on-chain decisions</div>
         <div id="feed">
           <div class="feed-row">
             <span class="ft">on-chain</span>
             <span class="fa fa-a">α Alpha</span>
-            <span class="fb hold">HOLD</span>
+            <span class="fb buy">BUY</span>
             <span style="font-size:11px;color:var(--w40)">CSPR/USD</span>
             <span class="fv">record_trade()</span>
-            <a href="https://testnet.cspr.live/deploy/0ecd580d07888138d73daa14427458faa9bdccf9592cfdb84109a14d0b05fee1" class="fh" target="_blank">0ecd58…fee1</a>
+            <a href="https://testnet.cspr.live/deploy/e2eed1407ca42d731f35297cfaa573e7fe176285e9d65c0d9110adde4489ab49" class="fh" target="_blank">e2eed1…ab49</a>
           </div>
           <div class="feed-row">
             <span class="ft">on-chain</span>
-            <span class="fa fa-b">β Beta</span>
-            <span class="fb hold">HOLD</span>
+            <span class="fa fa-a">α Alpha</span>
+            <span class="fb sell">SELL</span>
             <span style="font-size:11px;color:var(--w40)">CSPR/USD</span>
             <span class="fv">record_trade()</span>
-            <a href="https://testnet.cspr.live/deploy/335730cd588cab8b8989e7fd3459423fb46704dbc1629c62ddfc60417b3e9726" class="fh" target="_blank">335730…9726</a>
+            <a href="https://testnet.cspr.live/deploy/e03cbdf37e65571159c3ea3fded8250eaac333d9919c76745ec8b1a6bf0477b2" class="fh" target="_blank">e03cbd…77b2</a>
           </div>
           <div class="feed-row">
-            <span class="ft">started</span>
-            <span class="fa fa-a">Arena</span>
-            <span class="fb hold">LIVE</span>
+            <span class="ft">settled</span>
+            <span class="fa fa-b">β Beta</span>
+            <span class="fb buy">WIN</span>
             <span style="font-size:11px;color:var(--w40)">CSPR/USD</span>
-            <span class="fv">start_match()</span>
-            <a href="https://testnet.cspr.live/deploy/206f88d35390c4345542de735488355f4407f45580594cdca1b2cae8628276cb" class="fh" target="_blank">206f88…76cb</a>
+            <span class="fv">settle_match()</span>
+            <a href="https://testnet.cspr.live/deploy/e326f3a2afb9332a05bc3625e9cdd818277afa2814d472640e12e440a594d2dd" class="fh" target="_blank">e326f3…d2dd</a>
           </div>
         </div>
       </div>
@@ -624,7 +624,7 @@ footer {
     <!-- Live Match #19 fallback facts; live values are loaded from the spectator API. -->
     <div class="facts">
       <div class="fact">
-        <div class="fact-val"><span class="v-accent" id="f-trades">2</span></div>
+        <div class="fact-val"><span class="v-accent" id="f-trades">25</span></div>
         <div class="fact-lbl">Confirmed decisions</div>
       </div>
       <div class="fact">
